@@ -8,22 +8,48 @@ temp = []
 for file in files_list:
     with open('{}\{}'.format(diretorio, file), 'r') as f2:
         data = f2.read().split()
-        temp.append([int(data[5]), data[6], data[8], "{:.2f}".format(float(data[9]) * 100)])
+        temp.append([int(data[5]), int(data[6]), float(int(data[8])/1000), float("{:.2f}".format(float(data[9]) * 100))])
 
 df = pd.DataFrame(temp, columns=['NumThreads', 'NumeroMaximo', 'ElapsedTime', 'MeanUtilization'])
-print(df.sort_values(by="NumThreads", inplace=True))
+df.sort_values(by="NumThreads", inplace=True)
+print(df)
 
-x = df.NumThreads
-y = df.ElapsedTime
-height=0.5
-fig, ax = plt.subplots()
-bar = ax.bar(x, y, 5bottom=None, align="center")
-# Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('Elapsed Time')
-# ax.set_title('Scores by group and gender')
-# ax.set_ticks(x)
-ax.legend()
+def grafico_time(NumThreads, ElapsedTime):
+    x = NumThreads
+    y = ElapsedTime
+    width = 0.7
 
-fig.tight_layout()
+    fig, ax = plt.subplots()
+    bar = ax.bar(x, y, width, label = "Tempo decorrido")
+    ax.plot(x, y, color='red')
 
-plt.show()
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Tempo decorrido (Segundos)')
+    ax.set_xlabel('Número de threads')
+    ax.set_title('Tempo decorrido considerando número de threads')
+    ax.set_xticks(x)
+    ax.bar_label(bar, fmt="%.f")
+    ax.legend()
+    plt.show()
+
+
+def grafico_mean_cpu(NumThreads, MeanUtilization):
+    x = NumThreads
+    y = MeanUtilization
+    width = 0.7
+
+    fig, ax = plt.subplots()
+    bar = ax.bar(x, y, width, label = "Porcentagem média de uso da CPU")
+    ax.plot(x, y, color='red')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Média de uso da CPU (%)')
+    ax.set_xlabel('Número de threads')
+    ax.set_title('Porcentagem média de uso da CPU considerando número de threads')
+    ax.set_xticks(x)
+
+    ax.legend()
+    plt.show()
+
+grafico_time(df.NumThreads, df.ElapsedTime)
+grafico_mean_cpu(df.NumThreads, df.MeanUtilization)
